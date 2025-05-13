@@ -1,1 +1,7 @@
 /target
+
+/.lcpr_data
+/leetcode
+
+plugins.json
+rating.json
