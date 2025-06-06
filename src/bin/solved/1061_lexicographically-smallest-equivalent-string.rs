@@ -1,78 +1,70 @@
 /*
- * @lc app=leetcode id=1061 lang=rust
+ * @lc app=leetcode.cn id=1061 lang=rust
+ * @lcpr version=30204
  *
- * [1061] Lexicographically Smallest Equivalent String
+ * [1061] 按字典序排列最小的等效字符串
  */
 
-// @lc code=start
-use std::collections::HashMap;
-impl Solution {
-    pub fn smallest_equivalent_string(s1: String, s2: String, base_str: String) -> String {
-        struct Union {
-            parent: HashMap<char, char>,
-        }
-        impl Union {
-            fn find(&mut self, a: char) -> char {
-                let parent = self.parent[&a];
-                if parent != a {
-                    let root = self.find(parent);
-                    self.parent.insert(a, root);
-                }
-                self.parent[&a]
-            }
-            fn union(&mut self, a: char, b: char) {
-                let ra = self.find(a);
-                let rb = self.find(b);
-                if ra != rb {
-                    self.parent.insert(ra, rb);
-                }
-            }
-        }
-        let mut union = Union {
-            parent: HashMap::new(),
-        };
-        for ch in 'a'..='z' {
-            union.parent.insert(ch, ch);
-        }
-        for (a, b) in s1.chars().zip(s2.chars()) {
-            union.union(a, b);
-        }
-        let mut map = HashMap::new();
-        for ch in 'a'..='z' {
-            let root = union.find(ch);
-            let e = map.entry(root).or_insert_with(|| ch);
-            *e = ch.min(*e);
-        }
-        let ans = base_str
-            .chars()
-            .map(|ch: char| {
-                let root = union.find(ch);
-                let ch = map.get(&root).unwrap_or(&ch);
-                *ch
-            })
-            .collect();
-
-        ans
-    }
-}
-// @lc code=end
-
+// @lcpr-template-start
 struct Solution;
 fn main() {
     assert_eq!(
         Solution::smallest_equivalent_string(
-            "parker".to_owned(),
-            "morris".to_owned(),
-            "parser".to_owned()
+            "parker".to_string(),
+            "morris".to_string(),
+            "parser".to_string()
         ),
         "makkek"
     );
-    assert_eq!(
-        Solution::smallest_equivalent_string(
-            "dccaccbdafgeabeeghbigbhicggfbhiccfgbechdicbhdcgahi".to_owned(),
-            "igfcigeciahdafgegfbeddhgbacaeehcdiehiifgbhhehhccde".to_owned(),
-            "sanfbzzwblekirguignnfkpzgqjmjmfokrdfuqbgyflpsfpzbo".to_owned()
-        ),
-        "sanaazzwalakarauaannakpzaqjmjmaokraauqaayalpsapzao"
-    );
 }
+// @lcpr-template-end
+// @lc code=start
+impl Solution {
+    pub fn smallest_equivalent_string(s1: String, s2: String, base_str: String) -> String {
+        // 经典并查集
+        let s1 = s1.as_bytes();
+        let s2 = s2.as_bytes();
+        let mut uf = (0..26).map(|i| i as usize).collect::<Vec<_>>();
+        fn root(x: usize, uf: &mut [usize]) -> usize {
+            if uf[x] != x {
+                uf[x] = root(uf[x], uf);
+            }
+            uf[x]
+        }
+        let mut union = |x: usize, y: usize| {
+            let x = root(x, &mut uf);
+            let y = root(y, &mut uf);
+            if x != y {
+                uf[x.max(y)] = x.min(y);
+            }
+        };
+        for (x, y) in s1.iter().zip(s2.iter()) {
+            let x = x - b'a';
+            let y = y - b'a';
+            union(x as usize, y as usize);
+        }
+        let ans = base_str
+            .as_bytes()
+            .into_iter()
+            .map(|b| root(*b as usize - b'a' as usize, &mut uf) as u8 + b'a')
+            .collect::<Vec<_>>();
+
+        unsafe { String::from_utf8_unchecked(ans) }
+    }
+}
+// @lc code=end
+
+/*
+// @lcpr case=start
+// "parker"\n"morris"\n"parser"\n
+// @lcpr case=end
+
+// @lcpr case=start
+// "hello"\n"world"\n"hold"\n
+// @lcpr case=end
+
+// @lcpr case=start
+// "leetcode"\n"programs"\n"sourcecode"\n
+// @lcpr case=end
+
+ */

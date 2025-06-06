@@ -10,17 +10,9 @@ use leetcode_rs::vec2d;
 // @lcpr-template-start
 struct Solution;
 fn main() {
-    // assert_eq!(
-    //     Solution::maximum_value_sum(vec![1, 2, 1], 3, vec2d![[0, 1], [0, 2]]),
-    //     6
-    // );
     assert_eq!(
-        Solution::maximum_value_sum(
-            vec![0, 92, 56, 3, 34, 23, 56],
-            7,
-            vec2d![[2, 6], [4, 1], [5, 0], [1, 0], [3, 1], [6, 3]]
-        ),
-        288
+        Solution::maximum_value_sum(vec![1, 2, 1], 3, vec2d![[0, 1], [0, 2]]),
+        6
     );
 }
 // @lcpr-template-end
@@ -28,8 +20,9 @@ fn main() {
 use std::collections::HashMap;
 impl Solution {
     pub fn maximum_value_sum(nums: Vec<i32>, k: i32, edges: Vec<Vec<i32>>) -> i64 {
-        // 可以任意翻转两个节点，无所谓它们是不是在一个边上
-        let _ = edges; // 无所谓
+        // 节点翻转可以传递（转两次等于没转），
+        // 因而可以任意翻转两个节点，无所谓它们是不是在一个边上
+        let _ = edges; // 无所谓，只要之间有路径就行
         let mut diffs = nums.iter().map(|n| (n ^ k) - n).collect::<Vec<_>>();
         diffs.sort_unstable_by(|a, b| b.cmp(a));
         let mut ans = nums.iter().map(|i| *i as i64).sum::<i64>();
