@@ -13,24 +13,25 @@ fn main() {
     assert_eq!(
         Solution::divide_array(vec![1, 3, 4, 8, 7, 9, 3, 5, 1], 2),
         vec2d![[1, 1, 3], [3, 4, 5], [7, 8, 9]]
-    )
+    );
+
+    assert!(Solution::divide_array(vec![1, 3, 4, 8, 7, 9, 3, 5, 1], 0).is_empty());
 }
 // @lcpr-template-end
 // @lc code=start
 impl Solution {
     pub fn divide_array(nums: Vec<i32>, k: i32) -> Vec<Vec<i32>> {
         let mut nums = nums;
-        nums.sort_unstable();
-        let n = nums.len() / 3;
-        let mut ans = vec![vec![0; 3]; n];
-        for i in 0..n {
-            ans[i][0] = nums[i * 3];
-            ans[i][1] = nums[i * 3 + 1];
-            ans[i][2] = nums[i * 3 + 2];
-            if ans[i][2] - ans[i][0] > k {
+        nums.sort();
+        let mut ans = vec![];
+        let n = nums.len();
+        for i in (0..n).step_by(3) {
+            if nums[i + 2] - nums[i] > k {
                 return vec![];
             }
+            ans.push(vec![nums[i], nums[i + 1], nums[i + 2]]);
         }
+
         ans
     }
 }
